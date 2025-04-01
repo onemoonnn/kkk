@@ -1,0 +1,102 @@
+import java.util.*;
+
+public class Date implements Comparable<Date> {
+    private int day, month, year;
+
+    public Date(int day, int month, int year) {
+        if (isValidDate(day, month, year)) {
+            this.day = day;
+            this.month = month;
+            this.year = year;
+        } else {
+            throw new IllegalArgumentException("Invalid date.");
+        }
+    }
+
+    public boolean isValidDate(int d, int m, int y) {
+        if (y < 1 || m < 1 || m > 12 || d < 1) return false;
+        int[] daysInMonth = {31, isLeapYear(y) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        return d <= daysInMonth[m - 1];
+    }
+
+    public void updateDate(int d, int m, int y) {
+        if (isValidDate(d, m, y)) {
+            this.day = d;
+            this.month = m;
+            this.year = y;
+        } else {
+            System.out.println("Invalid date update.");
+        }
+    }
+
+    public String getDayOfWeek() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month - 1, day);
+        String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        return days[cal.get(Calendar.DAY_OF_WEEK) - 1];
+    }
+
+    public long calculateDifference(Date other) {
+        Calendar c1 = new GregorianCalendar(this.year, this.month - 1, this.day);
+        Calendar c2 = new GregorianCalendar(other.year, other.month - 1, other.day);
+        long diffMillis = Math.abs(c1.getTimeInMillis() - c2.getTimeInMillis());
+        return diffMillis / (24 * 60 * 60 * 1000);
+    }
+
+    public void printDate() {
+        String[] monthNames = {"January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"};
+        System.out.println(monthNames[month - 1] + " " + day + ", " + year);
+    }
+
+    private boolean isLeapYear(int y) {
+        return (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0);
+    }
+
+    @Override
+    public int compareTo(Date other) {
+        if (this.year != other.year) return this.year - other.year;
+        if (this.month != other.month) return this.month - other.month;
+        return this.day - other.day;
+    }
+} 
+
+// Main.java
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<Date> dates = new ArrayList<>();
+
+        try {
+            dates.add(new Date(1, 1, 2023));
+            dates.add(new Date(15, 2, 2020));
+            dates.add(new Date(29, 2, 2024)); // Leap year
+            dates.add(new Date(30, 2, 2021)); // Invalid
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+        Date date1 = new Date(10, 4, 2022);
+        Date date2 = new Date(25, 12, 2023);
+
+        date1.printDate();
+        System.out.println("Day of week: " + date1.getDayOfWeek());
+
+        System.out.println("Difference in days: " + date1.calculateDifference(date2));
+
+        System.out.println("Before Sorting:");
+        for (Date d : dates) {
+            d.printDate();
+        }
+
+        Collections.sort(dates);
+
+        System.out.println("\nAfter Sorting:");
+        for (Date d : dates) {
+            d.printDate();
+        }
+
+        date1.updateDate(31, 11, 2023); // Invalid update
+    }
+}
